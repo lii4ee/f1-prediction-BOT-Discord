@@ -4,9 +4,6 @@ from discord.ext import commands
 import json
 from datetime import datetime
 from discord import app_commands
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Bot configuration
 intents = discord.Intents.all()
@@ -78,8 +75,13 @@ async def on_ready():
     except Exception as e:
         print(f"Error syncing commands: {e}")
 
+async def log_command(interaction: discord.Interaction, command_name: str):
+    user = interaction.user
+    print(f"{datetime.now()}: User {user.name}#{user.discriminator} (ID: {user.id}) used command: {command_name}")
+
 @bot.tree.command(name="help", description="Shows how to use the F1 Prediction Bot")
 async def help(interaction: discord.Interaction):
+    await log_command(interaction, "help")
     help_message = """
 🏎️ **F1 Prediction Bot Commands** 🏎️
 
@@ -351,8 +353,6 @@ async def list_drivers(interaction: discord.Interaction):
 
     drivers_list = "\n".join([f"#{num}: {name}" for num, name in sorted(drivers_data['drivers'].items(), key=lambda x: int(x[0]))])
     await interaction.response.send_message(f"**Available Drivers:**\n{drivers_list}")
-
-
 
 # Run the bot
 discord_api_token = os.getenv("DiscordAPIToken")
